@@ -1,0 +1,3 @@
+2025-10-13 16:59:53.955401-04:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "VENTES" not found; SQL statement:
+INSERT INTO ventes (date) VALUES (?) [42102-224]
