@@ -53,13 +53,13 @@ public class chaussettecontroleur implements HttpHandler {
         }
     }
 
-    /** GET /chaussettes → liste toutes les chaussettes */
+
     private String handleGet() {
         List<chaussette> result = service.lister();
         return gson.toJson(result);
     }
 
-    /** POST /chaussettes → ajoute une nouvelle chaussette */
+
     private String handlePost(HttpExchange exchange) throws IOException {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         try {
@@ -71,7 +71,7 @@ public class chaussettecontroleur implements HttpHandler {
         }
     }
 
-    /** PUT /chaussettes?id=1 → modifie une chaussette existante */
+
     private String handlePut(HttpExchange exchange) throws IOException {
         Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
         if (!params.containsKey("id")) {
@@ -90,7 +90,7 @@ public class chaussettecontroleur implements HttpHandler {
         return gson.toJson(result);
     }
 
-    /** DELETE /chaussettes?id=1 → supprime une chaussette */
+
     private String handleDelete(HttpExchange exchange) {
         Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
         if (!params.containsKey("id")) {
