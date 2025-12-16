@@ -6,7 +6,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-
 public final class Hickaripool {
 
     private static final HikariDataSource dataSource;
@@ -45,3 +44,4 @@ public final class Hickaripool {
         dataSource.close();
     }
 }
+//chat pour le commit
