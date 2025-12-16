@@ -1,4 +1,4 @@
-package cal.info;
+/*package cal.info;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -44,3 +44,7 @@ public final class Hickaripool {
         dataSource.close();
     }
 }
+//chat pour le commit gvg hh
+
+
+ */
