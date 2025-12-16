@@ -1,5 +1,7 @@
 package cal.info;
 
+import java.util.Objects;
+
 public class chaussette {
     private int id;
     private String couleur;
@@ -27,4 +29,16 @@ public class chaussette {
     public void setTissu(String tissu) { this.tissu = tissu; }
     public double getPrix() { return prix; }
     public void setPrix(double prix) { this.prix = prix; }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        chaussette other = (chaussette) obj;
+        return Objects.equals(id, other.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

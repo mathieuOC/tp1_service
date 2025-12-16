@@ -3,6 +3,7 @@ package cal.info;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class vente {
     private int id;
@@ -24,4 +25,16 @@ public class vente {
     public void setDate(LocalDateTime date) { this.date = date; }
     public List<chaussette> getChaussettes() { return chaussettes; }
     public void addChaussette(chaussette c) { chaussettes.add(c); }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        vente other = (vente) obj;
+        return Objects.equals(id, other.id);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

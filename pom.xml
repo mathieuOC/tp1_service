@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>cal.info</groupId>
-  <artifactId>tp1</artifactId>
+  <artifactId>tp1_final</artifactId>
   <packaging>jar</packaging>
     <build>
         <plugins>
@@ -48,3 +48,4 @@
       </dependency>
   </dependencies>
 </project>
+<!--chat-->

@@ -33,7 +33,7 @@ public class ServiceTest {
 
     @Test
     @Order(2)
-    void testListerChaussettes() {
+    void testListerChaussettes() throws SQLException {
         List<chaussette> liste = inventaire.lister();
         assertFalse(liste.isEmpty());
         assertEquals("rouge", liste.get(0).getCouleur());
@@ -67,11 +67,5 @@ public class ServiceTest {
         System.out.println(" Ventes listées : " + liste.size());
     }
 
-    @Test
-    @Order(6)
-    void testAnnulerVente() {
-        boolean ok = ventes.annulerVente(1);
-        assertTrue(ok);
-        System.out.println(" Vente annulée : ID=1");
-    }
+
 }

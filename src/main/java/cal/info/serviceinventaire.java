@@ -1,13 +1,16 @@
 package cal.info;
 
+import com.zaxxer.hikari.pool.HikariPool;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class serviceinventaire {
     private final Connection conn;
+    private Connection connexion;
 
-    public serviceinventaire(Connection conn) {
+    public serviceinventaire(Connection conn) throws SQLException {
         this.conn = conn;
 
         try (Statement st = conn.createStatement()) {
@@ -44,23 +47,15 @@ public class serviceinventaire {
         }
     }
 
-    public List<chaussette> lister() {
-        List<chaussette> list = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM chaussettes");
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new chaussette(
-                        rs.getInt("id"),
-                        rs.getString("couleur"),
-                        rs.getString("taille"),
-                        rs.getString("tissu"),
-                        rs.getDouble("prix")
-                ));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public List<chaussette> lister() throws SQLException {
+        List<chaussette> liste = new ArrayList<>();
+        ResultSet rs = connexion.createStatement()
+                .executeQuery("SELECT * FROM chaussettes");
+
+        while (rs.next()) {
+            liste.add(map(rs));
         }
-        return list;
+        return liste;
     }
 
     public chaussette modifier(int id, chaussette updated) {
@@ -82,6 +77,17 @@ public class serviceinventaire {
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la modification : " + e.getMessage(), e);
         }
+    }
+
+
+    private chaussette map(ResultSet rs) throws SQLException {
+        return new chaussette(
+                rs.getInt("id"),
+                rs.getString("couleur"),
+                rs.getString("taille"),
+                rs.getString("type_tissu"),
+                rs.getDouble("prix")
+        );
     }
 
     public chaussette trouverParId(int id) {
@@ -112,4 +118,5 @@ public class serviceinventaire {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,13 +57,13 @@ public class ventecontrolleur implements HttpHandler {
         return gson.toJson(v);
     }
 
-    private String controlleurDelete(HttpExchange exchange) {
+    private String controlleurDelete(HttpExchange exchange) throws SQLException {
         Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
         if (!params.containsKey("id"))
             throw new IllegalArgumentException("Paramètre 'id' requis");
 
         int id = Integer.parseInt(params.get("id"));
-        boolean ok = service.annulerVente(id);
+        boolean ok = service.annuler(id);
         return "{\"success\":" + ok + "}";
     }
 
@@ -74,12 +75,9 @@ public class ventecontrolleur implements HttpHandler {
                 .collect(Collectors.toMap(p -> p[0], p -> p[1]));
     }
 
-    private void sendResponse(HttpExchange exchange, int code, String response) throws IOException {
-        exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
-        byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
-        exchange.sendResponseHeaders(code, bytes.length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(bytes);
-        }
+    private void sendResponse(HttpExchange ex, int code, String body) throws IOException {
+        ex.sendResponseHeaders(code, body.getBytes(StandardCharsets.UTF_8).length);
+        ex.getResponseBody().write(body.getBytes());
+        ex.close();
     }
 }

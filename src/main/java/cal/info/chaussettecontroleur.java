@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class chaussettecontroleur implements HttpHandler {
     }
 
 
-    private String handleGet() {
+    private String handleGet() throws SQLException {
         List<chaussette> result = service.lister();
         return gson.toJson(result);
     }
@@ -110,11 +111,9 @@ public class chaussettecontroleur implements HttpHandler {
                 .collect(Collectors.toMap(p -> p[0], p -> p[1]));
     }
 
-    private void sendResponse(HttpExchange exchange, int code, String response) throws IOException {
-        exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
-        exchange.sendResponseHeaders(code, response.getBytes(StandardCharsets.UTF_8).length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(response.getBytes(StandardCharsets.UTF_8));
-        }
+    private void sendResponse(HttpExchange ex, int code, String body) throws IOException {
+        ex.sendResponseHeaders(code, body.getBytes(StandardCharsets.UTF_8).length);
+        ex.getResponseBody().write(body.getBytes());
+        ex.close();
     }
 }

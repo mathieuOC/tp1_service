@@ -1,6 +1,7 @@
 package cal.info;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,62 +34,64 @@ public class servicevente {
         }
     }
 
-    public vente creerVente(List<Integer> chaussetteIds) {
+    public vente creer(List<Integer> idsChaussettes) throws SQLException {
+        conn.setAutoCommit(false);
+
         try {
-            conn.setAutoCommit(false);
+            int venteId;
 
+            try (PreparedStatement ps =
+                         conn.prepareStatement(
+                                 "INSERT INTO ventes (date_vente) VALUES (?)",
+                                 Statement.RETURN_GENERATED_KEYS)) {
 
-            vente v = new vente();
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO ventes (date) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
-                ps.setTimestamp(1, Timestamp.valueOf(v.getDate()));
+                ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
                 ps.executeUpdate();
 
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) v.setId(rs.getInt(1));
-                }
+                ResultSet rs = ps.getGeneratedKeys();
+                rs.next();
+                venteId = rs.getInt(1);
             }
 
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO ventes_chaussettes (id_vente, id_chaussette) VALUES (?, ?)")) {
-                for (Integer idC : chaussetteIds) {
-                    chaussette c = inventaire.trouverParId(idC);
-                    if (c == null) throw new IllegalArgumentException("Chaussette introuvable id=" + idC);
-                    ps.setInt(1, v.getId());
-                    ps.setInt(2, idC);
-                    ps.addBatch();
+            for (int id : idsChaussettes) {
+                try (PreparedStatement ps =
+                             conn.prepareStatement(
+                                     "INSERT INTO vente_chaussette (vente_id, chaussette_id) VALUES (?, ?)")) {
+                    ps.setInt(1, venteId);
+                    ps.setInt(2, id);
+                    ps.executeUpdate();
                 }
-                ps.executeBatch();
+
+                conn.prepareStatement(
+                        "DELETE FROM chaussettes WHERE id=" + id).executeUpdate();
             }
 
             conn.commit();
-            return v;
+            return new vente(venteId);
+
         } catch (Exception e) {
-            try { conn.rollback(); } catch (SQLException ignored) {}
-            throw new RuntimeException(e);
+            conn.rollback();
+            throw e;
         } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException ignored) {}
+            conn.setAutoCommit(true);
         }
     }
 
-    public boolean annulerVente(int idVente) {
-        String deleteDetails = "DELETE FROM ventes_chaussettes WHERE id_vente = ?";
-        String deleteVente = "DELETE FROM ventes WHERE id = ?";
-
-        try (PreparedStatement ps1 = conn.prepareStatement(deleteDetails);
-             PreparedStatement ps2 = conn.prepareStatement(deleteVente)) {
-
-            ps1.setInt(1, idVente);
-            ps1.executeUpdate();
-
-            ps2.setInt(1, idVente);
-            int rows = ps2.executeUpdate();
-
-            return rows > 0;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public boolean annuler(int id) throws SQLException {
+        conn.setAutoCommit(false);
+        try {
+            conn.prepareStatement(
+                    "DELETE FROM vente_chaussette WHERE vente_id=" + id).executeUpdate();
+            conn.prepareStatement(
+                    "DELETE FROM ventes WHERE id=" + id).executeUpdate();
+            conn.commit();
+        } catch (Exception e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
         }
+        return false;
     }
 
     public List<vente> lister() {
@@ -104,5 +107,9 @@ public class servicevente {
             throw new RuntimeException(e);
         }
         return list;
+    }
+
+    public vente creerVente(List<Integer> ids) {
+return null;
     }
 }
