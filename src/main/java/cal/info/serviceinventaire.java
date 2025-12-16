@@ -72,7 +72,7 @@ public class serviceinventaire {
                 updated.setId(id);
                 return updated;
             } else {
-                return null; // pas trouvé
+                return null;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la modification : " + e.getMessage(), e);
